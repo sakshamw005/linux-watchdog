@@ -1,5 +1,5 @@
 # linux-watchdog
-***
+```
 embedded-linux-watchdog/
 │
 ├── agent/
@@ -47,4 +47,4 @@ embedded-linux-watchdog/
 │
 ├── README.md
 └── .gitignore
-***
+```
