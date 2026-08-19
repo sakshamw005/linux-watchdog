@@ -127,21 +127,6 @@ export const App: React.FC = () => {
         onRestartSuccess={fetchTelemetry}
       />
 
-      {/* Footer */}
-      <footer className="bg-slate-950 border-t border-slate-800/80 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-slate-500 gap-2">
-          <div>
-            Embedded Linux Process Watchdog Dashboard • Academic Project
-          </div>
-          <div className="flex items-center space-x-3">
-            <span>Deterministic Rules Engine</span>
-            <span>•</span>
-            <span>POSIX /proc Telemetry</span>
-            <span>•</span>
-            <span className="text-cyan-400">Zero ML</span>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

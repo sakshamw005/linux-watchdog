@@ -70,36 +70,82 @@ class HealthEngine:
                 ))
                 score -= 10
 
-        # 2. Check recent alerts (last 10 minutes)
+        # 2. Check real-time monitored process states
         cursor.execute("""
-            SELECT event_type, severity, process_name, COUNT(*) as cnt
-            FROM events
-            WHERE timestamp >= datetime('now', '-10 minutes')
-            GROUP BY event_type, severity, process_name
+            SELECT DISTINCT process_name, pid, state 
+            FROM process_metrics 
+            WHERE is_monitored = 1 
+            AND timestamp = (SELECT MAX(timestamp) FROM process_metrics)
         """)
-        event_rows = cursor.fetchall()
-        for row in event_rows:
-            sev = row["severity"]
-            etype = row["event_type"]
+        monitored_rows = cursor.fetchall()
+        
+        for row in monitored_rows:
             pname = row["process_name"]
-            cnt = row["cnt"]
-
-            if sev == "CRITICAL" or etype in ("PROCESS_CRASH", "REPEATED_CRASH", "PROCESS_HANG"):
+            pid = row["pid"]
+            state = row["state"]
+            
+            # Get the latest event for this process to check if it's in an active error state
+            cursor.execute("""
+                SELECT event_type, severity 
+                FROM events 
+                WHERE process_name = ? 
+                ORDER BY timestamp DESC LIMIT 1
+            """, (pname,))
+            latest_ev = cursor.fetchone()
+            
+            # Case 1: Process is not running (crashed/stopped)
+            if state not in ("RUNNING", "S", "R", "D"):
                 pts = 25
                 penalties.append(HealthPenalty(
-                    reason=f"Critical alert ({etype}) on process '{pname}' ({cnt} incident(s))",
+                    reason=f"Monitored process '{pname}' is not running (State: {state})",
                     points_deducted=pts,
                     severity="CRITICAL"
                 ))
                 score -= pts
-            elif sev == "WARNING" or etype in ("HIGH_CPU", "HIGH_MEMORY", "MEMORY_GROWTH"):
-                pts = 10
-                penalties.append(HealthPenalty(
-                    reason=f"Warning alert ({etype}) on process '{pname}' ({cnt} instance(s))",
-                    points_deducted=pts,
-                    severity="WARNING"
-                ))
-                score -= pts
+            
+            # Case 2: Process is running but has an active hang or crash loop
+            elif latest_ev:
+                etype = latest_ev["event_type"]
+                
+                if etype == "PROCESS_HANG":
+                    pts = 30
+                    penalties.append(HealthPenalty(
+                        reason=f"Active hang detected on process '{pname}' (PID {pid})",
+                        points_deducted=pts,
+                        severity="CRITICAL"
+                    ))
+                    score -= pts
+                elif etype == "REPEATED_CRASH":
+                    pts = 30
+                    penalties.append(HealthPenalty(
+                        reason=f"Process '{pname}' is in a repeated crash loop (restarts disabled)",
+                        points_deducted=pts,
+                        severity="CRITICAL"
+                    ))
+                    score -= pts
+
+        # 3. Check for active warning/resource alerts in the last 2 minutes
+        cursor.execute("""
+            SELECT event_type, process_name, value, threshold
+            FROM events
+            WHERE event_type IN ('HIGH_CPU', 'HIGH_MEMORY', 'MEMORY_GROWTH')
+            AND datetime(timestamp) >= datetime('now', '-2 minutes')
+            GROUP BY event_type, process_name
+        """)
+        warning_rows = cursor.fetchall()
+        for row in warning_rows:
+            etype = row["event_type"]
+            pname = row["process_name"]
+            val = row["value"]
+            thresh = row["threshold"]
+            
+            pts = 10
+            penalties.append(HealthPenalty(
+                reason=f"Active {etype} warning on process '{pname}' ({val:.1f}% >= {thresh:.1f}%)",
+                points_deducted=pts,
+                severity="WARNING"
+            ))
+            score -= pts
 
         # Clamp score between 0 and 100
         score = max(0, min(100, score))

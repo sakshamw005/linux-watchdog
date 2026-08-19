@@ -56,7 +56,7 @@ def get_watchdog_status():
         cursor.execute("""
             SELECT COUNT(*) as active_alerts FROM events 
             WHERE severity IN ('WARNING', 'CRITICAL') 
-            AND timestamp >= datetime('now', '-5 minutes');
+            AND datetime(timestamp) >= datetime('now', '-5 minutes');
         """)
         active_alerts = cursor.fetchone()["active_alerts"]
 

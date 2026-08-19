@@ -123,7 +123,16 @@ export const IncidentTimelinePage: React.FC = () => {
                             <span>{item.title}</span>
                           </div>
                           <span className="text-slate-500 text-[11px]">
-                            {item.timestamp.slice(11, 19)}
+                            {(() => {
+                              try {
+                                const d = new Date(item.timestamp);
+                                if (isNaN(d.getTime())) return item.timestamp;
+                                const pad = (n: number) => n.toString().padStart(2, '0');
+                                return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+                              } catch {
+                                return item.timestamp;
+                              }
+                            })()}
                           </span>
                         </div>
                         <p className="text-xs text-slate-300">{item.description}</p>

@@ -229,7 +229,16 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
                         <span className="text-slate-400">({ev.process_name})</span>
                       </div>
                       <span className="text-[11px] text-slate-400">
-                        {ev.timestamp.slice(11, 19)}
+                        {(() => {
+                          try {
+                            const d = new Date(ev.timestamp);
+                            if (isNaN(d.getTime())) return ev.timestamp;
+                            const pad = (n: number) => n.toString().padStart(2, '0');
+                            return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+                          } catch {
+                            return ev.timestamp;
+                          }
+                        })()}
                       </span>
                     </div>
                     <p className="text-slate-300 text-[11px] mt-1">{ev.message}</p>

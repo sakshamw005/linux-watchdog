@@ -153,7 +153,16 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ events, onSelectProcess 
                         </div>
                       )}
                       <div className="text-[11px] text-slate-500 mt-0.5">
-                        {ev.timestamp.slice(0, 19).replace('T', ' ')}
+                        {(() => {
+                          try {
+                            const d = new Date(ev.timestamp);
+                            if (isNaN(d.getTime())) return ev.timestamp;
+                            const pad = (n: number) => n.toString().padStart(2, '0');
+                            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+                          } catch {
+                            return ev.timestamp;
+                          }
+                        })()}
                       </div>
                     </div>
 

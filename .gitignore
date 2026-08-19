@@ -1,0 +1,56 @@
+# C++ Agent Build Artifacts
+**/build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.a
+*.o
+*.so
+agent/build/
+tests/build/
+
+# Compiled Executables
+agent/src/watchdog_agent
+tests/cpu_stress/cpu_stress
+tests/crash_test/test_service
+tests/hang_test/hang_service
+tests/memory_stress/memory_stress
+
+# Python Backend
+**/venv/
+**/.venv/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+backend/watchdog.db
+backend/watchdog.db-journal
+backend/watchdog.db-wal
+
+# React Dashboard
+**/node_modules/
+dashboard/dist/
+dashboard/build/
+.eslintcache
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs and Temp
+**/logs/
+*.log
+/tmp/watchdog/
+/tmp/watchdog/*
+
+# OS/Editor leftovers
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.vs/
+*.user
+*.suo
+*.sln

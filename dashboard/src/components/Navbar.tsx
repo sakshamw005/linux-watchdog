@@ -44,9 +44,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navItems = [
     { id: 'overview', label: 'Overview', icon: Activity },
     { id: 'processes', label: 'Processes', icon: Cpu },
-    { id: 'alerts', label: 'Alerts & Diagnostics', icon: Bell, badge: status?.active_alerts },
-    { id: 'incidents', label: 'Incident Timelines', icon: GitCommit },
-    { id: 'settings', label: 'Watchdog Rules', icon: Sliders },
+    { id: 'alerts', label: 'Alerts', icon: Bell, badge: status?.active_alerts },
+    { id: 'incidents', label: 'Timeline', icon: GitCommit },
+    { id: 'settings', label: 'Rules', icon: Sliders },
   ];
 
   return (
@@ -54,23 +54,17 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-              <Server className="w-5 h-5 text-white" />
+          <div className="flex items-center space-x-2 lg:space-x-3 flex-1 justify-start min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
+              <Server className="w-4 h-4 text-white" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold tracking-tight text-white">EMBEDDED LINUX</span>
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/50">
-                  WATCHDOG
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 font-mono">POSIX /proc Monitor & Recovery Agent</p>
-            </div>
+            <span className="text-xs sm:text-sm lg:text-base font-bold tracking-tight text-white whitespace-nowrap">
+              WATCHDOG DASHBOARD
+            </span>
           </div>
 
           {/* Center Navigation */}
-          <nav className="hidden md:flex space-x-1">
+          <nav className="hidden md:flex space-x-0.5 lg:space-x-1 shrink-0 justify-center items-center mx-2 lg:mx-4">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -78,16 +72,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`flex items-center space-x-1.5 px-2 lg:px-3 py-2 rounded-lg text-xs lg:text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-sm'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
                   <span>{item.label}</span>
                   {Boolean(item.badge && item.badge > 0) && (
-                    <span className="ml-1.5 px-1.5 py-0.5 text-xs font-mono font-bold bg-rose-500 text-white rounded-full">
+                    <span className="ml-1 px-1 py-0.2 text-[10px] font-mono font-bold bg-rose-500 text-white rounded-full">
                       {item.badge}
                     </span>
                   )}
@@ -97,43 +91,25 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
 
           {/* Right Live Status Badges */}
-          <div className="flex items-center space-x-4">
-            {/* Health Score Pill */}
-            {health && (
-              <div className={`hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
-                health.score >= 70
-                  ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/60'
-                  : health.score >= 40
-                  ? 'bg-amber-950/60 text-amber-400 border-amber-800/60'
-                  : 'bg-rose-950/60 text-rose-400 border-rose-800/60'
-              }`}>
-                {health.score >= 70 ? (
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                ) : (
-                  <ShieldAlert className="w-3.5 h-3.5" />
-                )}
-                <span>Health: {health.score}/100</span>
-              </div>
-            )}
-
+          <div className="flex items-center space-x-1.5 lg:space-x-3 flex-1 justify-end">
             {/* Agent Connection Indicator */}
-            <div className="flex items-center space-x-2 text-xs font-mono bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800">
-              <span className={`w-2 h-2 rounded-full ${status?.agent_connected ? 'bg-emerald-400 pulse-emerald' : 'bg-rose-500'}`} />
-              <span className="text-slate-300">{status?.agent_connected ? 'AGENT ONLINE' : 'AGENT OFFLINE'}</span>
+            <div className="flex items-center space-x-1.5 text-[10px] lg:text-xs font-mono bg-slate-900 px-2 lg:px-3 py-1.5 rounded-lg border border-slate-800 shrink-0">
+              <span className={`w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full ${status?.agent_connected ? 'bg-emerald-400 pulse-emerald' : 'bg-rose-500'}`} />
+              <span className="text-slate-300">{status?.agent_connected ? 'ONLINE' : 'OFFLINE'}</span>
             </div>
 
             {/* Live Clock */}
-            <div className="hidden lg:block text-xs font-mono text-slate-400">
+            <div className="hidden xl:block text-xs font-mono text-slate-400 shrink-0">
               {timeStr}
             </div>
 
             {/* Manual Refresh Button */}
             <button
               onClick={onRefresh}
-              className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-1.5 lg:p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition-colors shrink-0"
               title="Refresh telemetry"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`} />
             </button>
           </div>
         </div>
