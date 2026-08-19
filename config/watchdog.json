@@ -1,0 +1,20 @@
+{
+  "monitor_interval_seconds": 2,
+  "api_url": "http://127.0.0.1:8000",
+  "disk_warning_percent": 85.0,
+  "disk_critical_percent": 95.0,
+  "processes": [
+    {
+      "name": "test_service",
+      "command": "./tests/crash_test/test_service",
+      "args": ["--heartbeat", "/tmp/watchdog/test_service.heartbeat", "--interval", "1"],
+      "restart_enabled": true,
+      "max_cpu_percent": 90.0,
+      "max_memory_percent": 80.0,
+      "max_restarts": 3,
+      "restart_window_seconds": 60,
+      "heartbeat_file": "/tmp/watchdog/test_service.heartbeat",
+      "heartbeat_timeout_seconds": 5
+    }
+  ]
+}

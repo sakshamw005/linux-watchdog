@@ -1,0 +1,17 @@
+[Unit]
+Description=Embedded Linux Process Watchdog & Systems Monitoring Agent
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/embedded-watchdog
+ExecStart=/opt/embedded-watchdog/agent/build/watchdog_agent --config /opt/embedded-watchdog/config/watchdog.json
+Restart=always
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
